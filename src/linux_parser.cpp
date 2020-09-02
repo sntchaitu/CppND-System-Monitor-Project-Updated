@@ -6,6 +6,7 @@
 #include "linux_parser.h"
 
 using std::stof;
+using std::stol;
 using std::string;
 using std::to_string;
 using std::vector;
@@ -117,20 +118,55 @@ long LinuxParser::UpTime() {
 
 
 // TODO: Read and return the number of jiffies for the system
-long LinuxParser::Jiffies() { return 0; }
+long LinuxParser::Jiffies() {
+return UpTime()*sysconf(_SC_CLK_TCK);
+}
 
 // TODO: Read and return the number of active jiffies for a PID
 // REMOVE: [[maybe_unused]] once you define the function
 long LinuxParser::ActiveJiffies(int pid[[maybe_unused]]) { return 0; }
 
 // TODO: Read and return the number of active jiffies for the system
-long LinuxParser::ActiveJiffies() { return 0; }
+long LinuxParser::ActiveJiffies() {
+  vector<string> cpuvalues = CpuUtilization();
+  return stol(cpuvalues[CPUStates::kIdle_])+
+         stol(cpuvalues[CPUStates::kIOwait_]);
+
+}
 
 // TODO: Read and return the number of idle jiffies for the system
-long LinuxParser::IdleJiffies() { return 0; }
+long LinuxParser::IdleJiffies() {
+  vector<string> cpuvalues = CpuUtilization();
+  return stol(cpuvalues[CPUStates::kUser_])+
+         stol(cpuvalues[CPUStates::kNice_])+
+         stol(cpuvalues[CPUStates::kSystem_])+
+         stol(cpuvalues[CPUStates::kIRQ_])+
+         stol(cpuvalues[CPUStates::kSoftIRQ_])+
+         stol(cpuvalues[CPUStates::kSteal_])+
+         stol(cpuvalues[CPUStates::kGuest_])+
+         stol(cpuvalues[CPUStates::kGuestNice_]);
+}
 
 // TODO: Read and return CPU utilization
-vector<string> LinuxParser::CpuUtilization() { return {}; }
+vector<string> LinuxParser::CpuUtilization() {
+  string line;
+  string value;
+  vector<string> cpuvalues;
+  std::ifstream filestream(kProcDirectory + kStatFilename);
+  if (filestream.is_open()) {
+    while (std::getline(filestream, line)) {
+      std::istringstream linestream(line);
+      while(linestream>>value)
+      {
+        if(value=="cpu"){
+          while(linestream>>value)cpuvalues.push_back(value);
+          return cpuvalues;
+        }
+      }
+    }
+  }
+  return cpuvalues;
+}
 
 // TODO: Read and return the total number of processes
 int LinuxParser::TotalProcesses() {

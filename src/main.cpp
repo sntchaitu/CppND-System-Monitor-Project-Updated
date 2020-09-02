@@ -7,7 +7,7 @@ using namespace std;
 int main() {
   System system;
   NCursesDisplay::Display(system);
-//  LinuxParser::UpTime();
+//  std::cout<<"memory utilization: "<<LinuxParser::MemoryUtilization();
 
 //std::cout<<"Elaspsed time"<<Format::ElapsedTime(10999);
 //return 0;

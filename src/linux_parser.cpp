@@ -123,7 +123,7 @@ long LinuxParser::ActiveJiffies(int pid) {
         else if(counter==kCutime_) total_time_in_ticks += stol(token);
         else if(counter==kCstime_){
           total_time_in_ticks += stol(token);
-          break;
+          return total_time_in_ticks;
         }
         counter++;
       }
@@ -133,13 +133,6 @@ long LinuxParser::ActiveJiffies(int pid) {
 
 long LinuxParser::ActiveJiffies() {
   vector<string> cpuvalues = CpuUtilization();
-  return stol(cpuvalues[CPUStates::kIdle_])+
-         stol(cpuvalues[CPUStates::kIOwait_]);
-
-}
-
-long LinuxParser::IdleJiffies() {
-  vector<string> cpuvalues = CpuUtilization();
   return stol(cpuvalues[CPUStates::kUser_])+
          stol(cpuvalues[CPUStates::kNice_])+
          stol(cpuvalues[CPUStates::kSystem_])+
@@ -148,6 +141,12 @@ long LinuxParser::IdleJiffies() {
          stol(cpuvalues[CPUStates::kSteal_])+
          stol(cpuvalues[CPUStates::kGuest_])+
          stol(cpuvalues[CPUStates::kGuestNice_]);
+}
+
+long LinuxParser::IdleJiffies() {
+  vector<string> cpuvalues = CpuUtilization();
+  return stol(cpuvalues[CPUStates::kIdle_])+
+         stol(cpuvalues[CPUStates::kIOwait_]);
 }
 
 vector<string> LinuxParser::CpuUtilization() {

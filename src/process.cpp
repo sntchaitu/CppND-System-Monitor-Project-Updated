@@ -21,13 +21,13 @@ int Process::Pid() {
 }
 
 float Process::CpuUtilization() {
-  long system_up_time = LinuxParser::UpTime();
-  long process_start_time = LinuxParser::UpTime(pid);
+  float system_uptime = (float)LinuxParser::UpTime();
   long hertz = sysconf(_SC_CLK_TCK);
   long total_time_in_ticks = LinuxParser::ActiveJiffies(pid);
-  long seconds = system_up_time - (process_start_time/hertz);
-  float total_time_in_seconds = (float)(total_time_in_ticks) / hertz;
-  cpuUtilization =  total_time_in_seconds/(float)seconds;
+  long total_time_in_seconds = total_time_in_ticks/hertz;
+  long process_uptime = LinuxParser::UpTime(pid);
+  float seconds = system_uptime - (process_uptime / hertz);
+  cpuUtilization = total_time_in_seconds/seconds;
   return cpuUtilization;
 }
 

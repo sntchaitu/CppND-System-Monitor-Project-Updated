@@ -6,8 +6,8 @@ class Processor {
   float Utilization();
 
  private:
-  long prev_active_jiffies = 0;
-  long prev_idle_jiffies = 0;
+  long prev_total = 0;
+  long prev_idle = 0;
 };
 
 #endif

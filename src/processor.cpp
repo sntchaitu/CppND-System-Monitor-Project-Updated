@@ -7,13 +7,16 @@ using std::string;
 
 float Processor::Utilization() {
   float utilization;
-  long active_jiffies = LinuxParser::ActiveJiffies();
-  long idle_jiffies   = LinuxParser::IdleJiffies();
-  long cpu_used = active_jiffies-prev_active_jiffies;
-  long cpu_idle  = idle_jiffies-prev_idle_jiffies;
-  long cpu_total = cpu_idle+cpu_used;
-  utilization = ((float)cpu_used)/cpu_total;
-  prev_active_jiffies = active_jiffies;
-  prev_idle_jiffies   = idle_jiffies;
+  long active = LinuxParser::ActiveJiffies();
+  long idle   = LinuxParser::IdleJiffies();
+  long cpu_total = active+idle;
+  if(cpu_total>0){
+    utilization =  ((float)cpu_total-idle)/cpu_total;
+    }
+//  long total_diff = cpu_total-prev_total;
+//  long idle_diff  = idle-prev_idle;
+//  utilization = (float)(total_diff-idle_diff)/total_diff;
+//  prev_total = cpu_total;
+//  prev_idle   = idle;
   return utilization;
 }
